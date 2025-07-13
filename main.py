@@ -7,6 +7,7 @@ import re
 import geocoder
 import os
 import platform
+import requests
 
 
 # Format bytes to human-readable format
@@ -16,7 +17,24 @@ def format_bytes(value):
         return f"{value / 1_000_000_000:.2f} GB"
     else:
         return f"{value / 1_000_000:.2f} MB"
-
+    
+# Get location info using ip-api.com
+def get_location_info():
+    """Get IP-based location using ip-api.com"""
+    try:
+        response = requests.get("http://ip-api.com/json", timeout=5)
+        data = response.json()
+        if data['status'] == 'success':
+            city = data.get('city', 'Unknown')
+            country = data.get('country', 'Unknown')
+            lat = data.get('lat')
+            lon = data.get('lon')
+            return (city, country, [lat, lon])
+        else:
+            return ('Unknown', 'Unknown', None)
+    except Exception as e:
+        return ('Error', 'Error', None)
+    
 # Parse time intervals like "3d", "2h", "5m", etc.
 def parse_time_interval(s):
     """Parse a time interval string into a timedelta object."""
@@ -128,12 +146,14 @@ class MyShell(cmd.Cmd):
         print("\n📊 [PC-Hub] Dashboard")
         print("────────────────────────────")
         print(f"🕒 Time:        {now}")
-        
-        ## Get location using geocoder
-        g = geocoder.ip('me')
-        print(f"📍 Location: {g.city}, {g.country}")
-        print(f"🌍 Coordinates: {g.latlng}")
-        
+
+        location_info = get_location_info()
+        print(f"📍 Location:   {location_info[0]}, {location_info[1]}")
+        if location_info[2]:
+            print(f"🌍 Coordinates: {location_info[2]}")
+        else:
+            print("🌍 Coordinates: Unknown")
+
         print(f"📟 Commands:    {self.command_count}")
         if self.last_note_title:
             print(f"📓 Last note:   {self.last_note_title}")
