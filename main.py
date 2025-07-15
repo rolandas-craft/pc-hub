@@ -117,13 +117,7 @@ class MyShell(cmd.Cmd):
         # Count commands for dashboard
         self.command_count += 1
         return line
-    
-    def parseline(self, line):
-        ## Handle network-log command. 
-        # If it starts with "network-log", replace it with "network_log"
-        if line.startswith("network-log"):
-            line = line.replace("network-log", "network_log", 1)
-        return super().parseline(line)
+
         
     ## List all commands
     def do_commands(self, arg):
@@ -211,10 +205,41 @@ class MyShell(cmd.Cmd):
             os.system('cls')
         else:
             os.system('clear')
-    
+        
     def do_network_log(self, arg):
-        """Read and display the network log."""
-        network_utils.read_network_log()
+        """Read and display the network log with optional date filters."""
+        from network_utils import read_network_log
+
+        tokens = arg.split()
+        from_time = None
+        to_time = None
+
+        def parse_datetime(parts):
+            formats = [
+                "%Y-%m-%d %H:%M",
+                "%Y-%m-%d %H",
+                "%Y-%m-%d",
+                "%Y-%m",
+                "%Y"
+            ]
+            dt_str = " ".join(parts)
+            for fmt in formats:
+                try:
+                    return datetime.strptime(dt_str, fmt)
+                except ValueError:
+                    continue
+            return None
+
+        # Try parsing based on number of tokens
+        if len(tokens) in (1, 2):
+            from_time = parse_datetime(tokens[:1])
+            to_time = parse_datetime(tokens[1:2]) if len(tokens) == 2 else None
+        elif len(tokens) in (3, 4):
+            from_time = parse_datetime(tokens[:2])
+            to_time = parse_datetime(tokens[2:4]) if len(tokens) == 4 else None
+
+
+        network_utils.read_network_log(from_time, to_time)
             
 if __name__ == '__main__':
     print("\n📟 [PC-Hub] Welcome to PC-Hub! Type 'help' for commands.")
