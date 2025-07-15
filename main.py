@@ -9,14 +9,10 @@ import os
 import platform
 import requests
 
+## My modules
+from utils import network_utils
+from utils import toolkit
 
-# Format bytes to human-readable format
-def format_bytes(value):
-    """Convert bytes to a human-readable format."""
-    if value >= 1_000_000_000:
-        return f"{value / 1_000_000_000:.2f} GB"
-    else:
-        return f"{value / 1_000_000:.2f} MB"
     
 # Get location info using ip-api.com
 def get_location_info():
@@ -107,15 +103,6 @@ def get_clean_uptime():
     uptime = ', '.join(up_part).strip()
     print(f"⏱️ Uptime: {uptime}")
     
-# Network info
-def show_network_info():
-    """Show network statistics including sent and received bytes."""
-    stats = psutil.net_io_counters()
-    sent = stats.bytes_sent
-    recv = stats.bytes_recv
-    stats = psutil.net_io_counters()
-    print(f"⬆️ Sent:     {format_bytes(sent)}")
-    print(f"⬇️ Received: {format_bytes(recv)}")
 
 
 # Custom shell class
@@ -130,6 +117,13 @@ class MyShell(cmd.Cmd):
         # Count commands for dashboard
         self.command_count += 1
         return line
+    
+    def parseline(self, line):
+        ## Handle network-log command. 
+        # If it starts with "network-log", replace it with "network_log"
+        if line.startswith("network-log"):
+            line = line.replace("network-log", "network_log", 1)
+        return super().parseline(line)
         
     ## List all commands
     def do_commands(self, arg):
@@ -171,6 +165,7 @@ class MyShell(cmd.Cmd):
         print(f"   Uptime: ", end="")
         get_clean_uptime()
         print("")
+        
 
     def do_clock(self, arg):
         """Show current time."""
@@ -181,7 +176,7 @@ class MyShell(cmd.Cmd):
 
     def do_network(self, arg):
         """Show network statistics."""
-        show_network_info()
+        network_utils.show_network_info()
     
 
     def do_exit(self, arg):
@@ -216,6 +211,10 @@ class MyShell(cmd.Cmd):
             os.system('cls')
         else:
             os.system('clear')
+    
+    def do_network_log(self, arg):
+        """Read and display the network log."""
+        network_utils.read_network_log()
             
 if __name__ == '__main__':
     print("\n📟 [PC-Hub] Welcome to PC-Hub! Type 'help' for commands.")

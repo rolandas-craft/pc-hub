@@ -21,5 +21,5 @@ def show_network_info():
 sent, recv = show_network_info()
 
 # Log the sent and received bytes to a file
-with open("/Users/rolandas/scripts/log/network-log.txt", "a") as f:
+with open("/Users/rolandas/scripts/log/network-log", "a") as f:
     f.write(f"{datetime.now()}|{sent}|{recv}\n")
