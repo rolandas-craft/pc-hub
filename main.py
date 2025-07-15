@@ -55,6 +55,7 @@ def parse_time_interval(s):
     elif unit == 'y':
         return timedelta(days=365 * value)  # Approximate
     
+# Create a new note in macOS Notes app
 def add_note(title, body):
     """Create a new note in macOS Notes app."""
     # Escape double quotes and backslashes inside body
@@ -83,6 +84,7 @@ def get_system_info(arg):
     else:
         raise ValueError("Invalid argument. Use 'cpu', 'memory', or 'disk'.")
     
+# Get battery status on macOS
 def get_battery_status():
     """Get battery status on macOS."""
     output = subprocess.check_output(['pmset', '-g', 'batt']).decode('utf-8')

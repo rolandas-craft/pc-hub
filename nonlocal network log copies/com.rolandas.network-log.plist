@@ -6,11 +6,11 @@
 	<string>com.rolandas.myscript</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/usr/bin/python3</string>
+		<string>/Library/Frameworks/Python.framework/Versions/3.13/bin/python3</string>
 		<string>/Users/rolandas/scripts/network-log.py</string>
 	</array>
 	<key>StartInterval</key>
-	<integer>10</integer>
+	<integer>600</integer>
 	<key>RunAtLoad</key>
 	<true/>
 	<key>StandardOutPath</key>
@@ -19,4 +19,4 @@
 	<string>/Users/rolandas/scripts/log/network-log.err</string>
 </dict>
 </plist>
-	x
+	
