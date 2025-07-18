@@ -13,6 +13,44 @@ import requests
 from utils import network_utils
 from utils import toolkit
 
+def network_log(self, arg):
+    """Read and display the network log with optional date filters."""
+    print(f"network log: {arg}")
+    pass
+    tokens = arg.split()
+    from_time = None 
+    to_time = None
+
+    def parse_datetime(parts):
+        formats = [
+            "%Y-%m-%d %H:%M",
+            "%Y-%m-%d %H",
+            "%Y-%m-%d",
+            "%Y-%m",
+            "%Y"
+        ]
+        dt_str = " ".join(parts)
+        print(f"Parsing datetime from: {dt_str}")
+        for fmt in formats:
+            try:
+                return datetime.strptime(dt_str, fmt)
+            except ValueError:
+                continue
+        return None
+
+    # Try parsing based on number of tokens
+    if len(tokens) == 1:
+        from_time = parse_datetime(tokens[:1])
+    elif len(tokens) == 2:
+        to_time = parse_datetime(tokens[0:2])
+
+    elif len(tokens) in (3, 4):
+        from_time = parse_datetime(tokens[:2])
+        to_time = parse_datetime(tokens[2:4]) if len(tokens) == 4 else None
+    
+    print(f"📊 [PC-Hub] Reading network log from {from_time} to {to_time}")
+    #network_utils.read_network_log(from_time, to_time)
+
     
 # Get location info using ip-api.com
 def get_location_info():
@@ -102,8 +140,6 @@ def get_clean_uptime():
     up_part = output.split(' up ')[1].split(',')[0:2]
     uptime = ', '.join(up_part).strip()
     print(f"⏱️ Uptime: {uptime}")
-    
-
 
 # Custom shell class
 class MyShell(cmd.Cmd):
@@ -116,9 +152,8 @@ class MyShell(cmd.Cmd):
         """Pre-command processing to handle command count and last note."""
         # Count commands for dashboard
         self.command_count += 1
-        return line
-
-        
+        return line 
+    
     ## List all commands
     def do_commands(self, arg):
         """List all user commands"""
@@ -166,12 +201,6 @@ class MyShell(cmd.Cmd):
         from datetime import datetime
         now = datetime.now()
         print(f"🕒 [PC-Hub] Current time: {now.strftime('%Y-%m-%d %H:%M:%S')}")
-        
-
-    def do_network(self, arg):
-        """Show network statistics."""
-        network_utils.show_network_info()
-    
 
     def do_exit(self, arg):
         """Exit the shell."""
@@ -205,50 +234,23 @@ class MyShell(cmd.Cmd):
             os.system('cls')
         else:
             os.system('clear')
-        
-    def do_network_log(self, arg):
-        """Read and display the network log with optional date filters."""
+    
+    def do_network(self, arg):
+        if not arg:
+            # Show current network statistics
+            network_utils.show_network_info() 
+        else:
+            if arg.startswith("--log"):
+                # Read network log with optional date filters
+                network_log(self, arg[6:].strip())
 
-        tokens = arg.split()
-        from_time = None
-        to_time = None
 
-        def parse_datetime(parts):
-            formats = [
-                "%Y-%m-%d %H:%M",
-                "%Y-%m-%d %H",
-                "%Y-%m-%d",
-                "%Y-%m",
-                "%Y"
-            ]
-            dt_str = " ".join(parts)
-            print(f"Parsing datetime from: {dt_str}")
-            for fmt in formats:
-                try:
-                    return datetime.strptime(dt_str, fmt)
-                except ValueError:
-                    continue
-            return None
-
-        # Try parsing based on number of tokens
-        if len(tokens) == 1:
-            from_time = parse_datetime(tokens[:1])
-        elif len(tokens) == 2:
-            to_time = parse_datetime(tokens[0:2])
-
-        elif len(tokens) in (3, 4):
-            from_time = parse_datetime(tokens[:2])
-            to_time = parse_datetime(tokens[2:4]) if len(tokens) == 4 else None
-        
-        print(f"📊 [PC-Hub] Reading network log from {from_time} to {to_time}")
-        #network_utils.read_network_log(from_time, to_time)
-
-            
 if __name__ == '__main__':
     print("\n📟 [PC-Hub] Welcome to PC-Hub! Type 'help' for commands.")
     
     shell = MyShell()
 
-    shell.onecmd("db")  
+    # at the beginning, execute db
+    #shell.onecmd("db")
 
     MyShell().cmdloop()
