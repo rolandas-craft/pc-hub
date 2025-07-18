@@ -41,11 +41,16 @@ def network_log(self, arg):
     # Try parsing based on number of tokens
     if len(tokens) == 1:
         from_time = parse_datetime(tokens[:1])
-    if len(tokens) > 1:
+
+    elif len(tokens) == 2:
         from_time = parse_datetime(tokens[0:2])
-    if len(tokens) == 3:
+
+    elif len(tokens) == 3:
+        from_time = parse_datetime(tokens[0:2])
         to_time = parse_datetime(tokens[2:3])
-    if len(tokens) > 3:
+
+    elif len(tokens) >= 4:
+        from_time = parse_datetime(tokens[0:2])
         to_time = parse_datetime(tokens[2:4])
     
     print(f" from time: {from_time} to time: {to_time}")
