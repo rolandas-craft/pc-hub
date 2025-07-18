@@ -208,7 +208,6 @@ class MyShell(cmd.Cmd):
         
     def do_network_log(self, arg):
         """Read and display the network log with optional date filters."""
-        from network_utils import read_network_log
 
         tokens = arg.split()
         from_time = None
@@ -223,6 +222,7 @@ class MyShell(cmd.Cmd):
                 "%Y"
             ]
             dt_str = " ".join(parts)
+            print(f"Parsing datetime from: {dt_str}")
             for fmt in formats:
                 try:
                     return datetime.strptime(dt_str, fmt)
@@ -231,15 +231,18 @@ class MyShell(cmd.Cmd):
             return None
 
         # Try parsing based on number of tokens
-        if len(tokens) in (1, 2):
+        if len(tokens) == 1:
             from_time = parse_datetime(tokens[:1])
-            to_time = parse_datetime(tokens[1:2]) if len(tokens) == 2 else None
+        elif len(tokens) == 2:
+            to_time = parse_datetime(tokens[0:2])
+
         elif len(tokens) in (3, 4):
             from_time = parse_datetime(tokens[:2])
             to_time = parse_datetime(tokens[2:4]) if len(tokens) == 4 else None
+        
+        print(f"📊 [PC-Hub] Reading network log from {from_time} to {to_time}")
+        #network_utils.read_network_log(from_time, to_time)
 
-
-        network_utils.read_network_log(from_time, to_time)
             
 if __name__ == '__main__':
     print("\n📟 [PC-Hub] Welcome to PC-Hub! Type 'help' for commands.")
