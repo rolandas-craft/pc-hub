@@ -15,13 +15,13 @@ from utils import toolkit
 
 def network_log(self, arg):
     """Read and display the network log with optional date filters."""
-    print(f"network log: {arg}")
-    pass
     tokens = arg.split()
     from_time = None 
     to_time = None
 
     def parse_datetime(parts):
+        print(f"Parsing datetime from: {parts}")
+        # Try parsing datetime from the provided parts
         formats = [
             "%Y-%m-%d %H:%M",
             "%Y-%m-%d %H",
@@ -30,7 +30,7 @@ def network_log(self, arg):
             "%Y"
         ]
         dt_str = " ".join(parts)
-        print(f"Parsing datetime from: {dt_str}")
+        
         for fmt in formats:
             try:
                 return datetime.strptime(dt_str, fmt)
@@ -41,14 +41,14 @@ def network_log(self, arg):
     # Try parsing based on number of tokens
     if len(tokens) == 1:
         from_time = parse_datetime(tokens[:1])
-    elif len(tokens) == 2:
-        to_time = parse_datetime(tokens[0:2])
-
-    elif len(tokens) in (3, 4):
-        from_time = parse_datetime(tokens[:2])
-        to_time = parse_datetime(tokens[2:4]) if len(tokens) == 4 else None
+    if len(tokens) > 1:
+        from_time = parse_datetime(tokens[0:2])
+    if len(tokens) == 3:
+        to_time = parse_datetime(tokens[2:3])
+    if len(tokens) > 3:
+        to_time = parse_datetime(tokens[2:4])
     
-    print(f"📊 [PC-Hub] Reading network log from {from_time} to {to_time}")
+    print(f" from time: {from_time} to time: {to_time}")
     #network_utils.read_network_log(from_time, to_time)
 
     
