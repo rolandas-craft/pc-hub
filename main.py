@@ -14,13 +14,9 @@ from utils import network_utils
 from utils import toolkit
 
 def network_log(self, arg):
-    """Read and display the network log with optional date filters."""
-    tokens = arg.split()
-    from_time = None 
-    to_time = None
-
+    print(f"Network log requested with argument: {arg}")
     def parse_datetime(parts):
-        print(f"Parsing datetime from: {parts}")
+
         # Try parsing datetime from the provided parts
         formats = [
             "%Y-%m-%d %H:%M",
@@ -37,24 +33,52 @@ def network_log(self, arg):
             except ValueError:
                 continue
         return None
+    
+    if arg.strip() == "day":
+        from_time = str(datetime.now() - timedelta(days=1))[:19]
+        to_time = str(datetime.now())[:19]
+    elif arg.strip() == "week":
+        from_time = datetime.now() - timedelta(weeks=1)
+        to_time = datetime.now()
+    elif arg.strip() == "month":
+        from_time = datetime.now() - timedelta(days=30)
+        to_time = datetime.now()
+    elif arg.strip() == "year":
+        from_time = datetime.now() - timedelta(days=365)
+        to_time = datetime.now()
+    elif arg.strip()[:5] == "hours":
+        try:
+            hours = int(arg.strip()[6:])
+            from_time = datetime.now() - timedelta(hours=hours)
+            to_time = datetime.now()
+        except ValueError:
+            print("Invalid hour format. Use 'hours <number>'.")
+            return 
+    else:
+        # Parse custom date range from the argument
+        tokens = arg.split()
+        from_time = None 
+        to_time = None
 
-    # Try parsing based on number of tokens
-    if len(tokens) == 1:
-        from_time = parse_datetime(tokens[:1])
 
-    elif len(tokens) == 2:
-        from_time = parse_datetime(tokens[0:2])
+        # Try parsing based on number of tokens
+        if len(tokens) == 1:
+            from_time = parse_datetime(tokens[:1])
 
-    elif len(tokens) == 3:
-        from_time = parse_datetime(tokens[0:2])
-        to_time = parse_datetime(tokens[2:3])
+        elif len(tokens) == 2:
+            from_time = parse_datetime(tokens[0:2])
 
-    elif len(tokens) >= 4:
-        from_time = parse_datetime(tokens[0:2])
-        to_time = parse_datetime(tokens[2:4])
+        elif len(tokens) == 3:
+            from_time = parse_datetime(tokens[0:2])
+            to_time = parse_datetime(tokens[2:3])
+
+        elif len(tokens) >= 4:
+            from_time = parse_datetime(tokens[0:2])
+            to_time = parse_datetime(tokens[2:4])
     
     print(f" from time: {from_time} to time: {to_time}")
     #network_utils.read_network_log(from_time, to_time)
+    
 
     
 # Get location info using ip-api.com
@@ -241,13 +265,24 @@ class MyShell(cmd.Cmd):
             os.system('clear')
     
     def do_network(self, arg):
+        arg = "--log 2025-07-20 12:32:53 2025-07-21 12:32:53"
+        network_log(self, arg[6:].strip())
+        
+        arg = "--log day"
+        network_log(self, arg[6:].strip())
+        
+
         if not arg:
             # Show current network statistics
-            network_utils.show_network_info() 
+            #network_utils.show_network_info() 
+            pass
         else:
             if arg.startswith("--log"):
                 # Read network log with optional date filters
-                network_log(self, arg[6:].strip())
+
+                #network_log(self, arg[6:].strip())
+                pass
+
 
 
 if __name__ == '__main__':
@@ -255,6 +290,9 @@ if __name__ == '__main__':
     
     shell = MyShell()
 
+    # at the beginning, execute network log
+    shell.onecmd("network")
+    
     # at the beginning, execute db
     #shell.onecmd("db")
 
