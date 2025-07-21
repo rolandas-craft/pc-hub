@@ -31,6 +31,7 @@ def read_network_log(from_time=None, to_time=None):
 
 # Read the log file
 def read_network_log(from_time=None, to_time=None):
+    print(f"Filtering from {from_time} to {to_time}")
     """Read and display network log from a file, optionally filtered by datetime."""
 
     log_path = "/Users/rolandas/scripts/log/network-log"
@@ -40,10 +41,10 @@ def read_network_log(from_time=None, to_time=None):
 
     # Adjust to_time if only from_time is provided and to_time is None
     if from_time and not to_time:
-        # Round from_time to day start if it's just a date
-        to_time = from_time.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
-
+        to_time = datetime.now().replace(second=0, microsecond=0)
+        
     print(f"Filtering from {from_time} to {to_time}")
+
 
     print("📊 [PC-Hub] Network Log:")
     print("────────────────────────────")
@@ -82,6 +83,7 @@ def network_log(self, arg):
                 continue
         return None
     
+    # Determine the time range based on the argument
     if arg.strip() == "day":
         from_time = datetime.strptime(str(datetime.now() - timedelta(days=1))[:16], "%Y-%m-%d %H:%M")
         to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
@@ -95,6 +97,7 @@ def network_log(self, arg):
         from_time = datetime.strptime(str(datetime.now() - timedelta(days=365))[:16], "%Y-%m-%d %H:%M")
         to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
     elif arg.strip()[:5] == "hours":
+        # Parse the number of hours from the argument
         try:
             hours = int(arg.strip()[6:])
             from_time = datetime.strptime(str(datetime.now() - timedelta(hours=hours))[:16], "%Y-%m-%d %H:%M")
@@ -108,13 +111,14 @@ def network_log(self, arg):
         from_time = None 
         to_time = None
 
-
         # Try parsing based on number of tokens
+        print(f"Tokens: {tokens}")
         if len(tokens) == 1:
             from_time = parse_datetime(tokens[:1])
 
         elif len(tokens) == 2:
             from_time = parse_datetime(tokens[0:2])
+            print(f"from_time: {from_time}")
 
         elif len(tokens) == 3:
             from_time = parse_datetime(tokens[0:2])
@@ -123,8 +127,8 @@ def network_log(self, arg):
         elif len(tokens) >= 4:
             from_time = parse_datetime(tokens[0:2])
             to_time = parse_datetime(tokens[2:4])
+            
+    print(f"Filtering1 from {from_time} to {to_time}")
     
-    print(type(from_time), type(to_time))
-    print(f" from time: {from_time} to time: {to_time}")
     read_network_log(from_time, to_time)
     

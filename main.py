@@ -199,37 +199,34 @@ class MyShell(cmd.Cmd):
             os.system('clear')
     
     def do_network(self, arg):
-        print("--------------------------------")
-        arg = "--log hours 1"
-        network_utils.network_log(self, arg[6:].strip())
-        
-
-        
-        print("--------------------------------")
-        
-        
+        """Show network statistics or read network log."""
         if not arg:
             # Show current network statistics
-            #network_utils.show_network_info() 
-            pass
+            network_utils.show_network_info()
         else:
             if arg.startswith("--log"):
+                
                 # Read network log with optional date filters
-
-                #network_log(self, arg[6:].strip())
-                pass
-
-
-
+                network_utils.network_log(self, arg[6:].strip())
+                
 if __name__ == '__main__':
-    print("\n📟 [PC-Hub] Welcome to PC-Hub! Type 'help' for commands.")
+    message = " [PC-Hub] Welcome to PC-Hub! Type 'help' for commands."
+    length = len(message)
+    border = "#" * (length + 4)
+    empty_space = "#" + " " * (length + 2) + "#"
+
+    print("\n")
+    print(border)
+    print(empty_space)
+    print(f"# {message} #")
+    print(empty_space)
+    print(border)
+    
+    ### Initialize the shell
     
     shell = MyShell()
-
-    # at the beginning, execute network log
-    shell.onecmd("network")
     
     # at the beginning, execute db
-    #shell.onecmd("db")
+    shell.onecmd("db")
 
     MyShell().cmdloop()
