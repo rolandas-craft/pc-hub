@@ -53,9 +53,14 @@ def network_log(self, arg):
     from_time = None
     to_time = None
     
+    if not arg.strip():
+        print("❌ No date range specified. Use 'network --log <from> <to>' or 'network --log <day|week|month|year|hour>'")
+        return
+    
     if arg.strip().split()[0] == "day":
-        from_time = datetime.strptime(str(datetime.now() - timedelta(days=1))[:16], "%Y-%m-%d %H:%M")
-        to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
+        now = datetime.now().replace(second=0, microsecond=0)
+        from_time = now - timedelta(days=1)
+        to_time = now
     elif arg.strip().split()[0] == "week":
         from_time = datetime.strptime(str(datetime.now() - timedelta(weeks=1))[:16], "%Y-%m-%d %H:%M")
         to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
