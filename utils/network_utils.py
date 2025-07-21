@@ -14,21 +14,6 @@ def show_network_info():
     print(f"⬇️ Received: {toolkit.format_bytes(recv)}")
     
 
-# Read network log
-def read_network_log(from_time=None, to_time=None):
-    """Read and display network log from a file, optionally filtered by datetime."""
-
-    log_path = "/Users/rolandas/scripts/log/network-log"
-    if not os.path.exists(log_path):
-        print("No network log found.")
-        return
-
-    if from_time or to_time:
-        print(f"Filtering from {from_time or 'beginning'} to {to_time or 'end'}")
-
-    print("📊 [PC-Hub] Network Log:")
-    print("────────────────────────────")
-
 # Read the log file
 def read_network_log(from_time=None, to_time=None):
     print(f"Filtering from {from_time} to {to_time}")
