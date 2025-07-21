@@ -227,6 +227,6 @@ if __name__ == '__main__':
     shell = MyShell()
     
     # at the beginning, execute db
-    shell.onecmd("db")
+    #shell.onecmd("db")
 
     MyShell().cmdloop()

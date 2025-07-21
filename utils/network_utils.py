@@ -49,71 +49,59 @@ def read_network_log(from_time=None, to_time=None):
                   f"Received: {toolkit.format_bytes(int(recv))}")
             
 def network_log(self, arg):
-    print(f"Network log requested with argument: {arg}")
-    def parse_datetime(parts):
-        # Try parsing datetime from the provided parts
-        formats = [
-            "%Y-%m-%d %H:%M",
-            "%Y-%m-%d %H",
-            "%Y-%m-%d",
-            "%Y-%m",
-            "%Y"
-        ]
-        dt_str = " ".join(parts)
-        
-        for fmt in formats:
-            try:
-                return datetime.strptime(dt_str, fmt)
-            except ValueError:
-                continue
-        return None
-    
     # Determine the time range based on the argument
-    if arg.strip() == "day":
+    from_time = None
+    to_time = None
+    
+    if arg.strip().split()[0] == "day":
         from_time = datetime.strptime(str(datetime.now() - timedelta(days=1))[:16], "%Y-%m-%d %H:%M")
         to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
-    elif arg.strip() == "week":
+    elif arg.strip().split()[0] == "week":
         from_time = datetime.strptime(str(datetime.now() - timedelta(weeks=1))[:16], "%Y-%m-%d %H:%M")
         to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
-    elif arg.strip() == "month":
+    elif arg.strip().split()[0] == "month":
         from_time = datetime.strptime(str(datetime.now() - timedelta(days=30))[:16], "%Y-%m-%d %H:%M")
         to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
-    elif arg.strip() == "year":
+    elif arg.strip().split()[0] == "year":
         from_time = datetime.strptime(str(datetime.now() - timedelta(days=365))[:16], "%Y-%m-%d %H:%M")
         to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
-    elif arg.strip()[:5] == "hours":
+    elif arg.strip().split()[0] == "hour":
         # Parse the number of hours from the argument
         try:
-            hours = int(arg.strip()[6:])
+            hours = int(arg.strip()[5:])
             from_time = datetime.strptime(str(datetime.now() - timedelta(hours=hours))[:16], "%Y-%m-%d %H:%M")
             to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
         except ValueError:
-            print("Invalid hour format. Use 'hours <number>'.")
+            print("Invalid hour format. Use 'hour <number>'.")
             return 
     else:
-        # Parse custom date range from the argument
         tokens = arg.split()
-        from_time = None 
-        to_time = None
 
-        # Try parsing based on number of tokens
-        print(f"Tokens: {tokens}")
-        if len(tokens) == 1:
-            from_time = parse_datetime(tokens[:1])
+        if len(tokens) >= 2:
+            from_str = " ".join(tokens[:2])
+            try:
+                from_time = datetime.strptime(from_str, "%Y-%m-%d %H:%M")
+            except ValueError:
+                print(f"❌ Invalid format for 'from time': '{from_str}'")
+                from_time = None
 
-        elif len(tokens) == 2:
-            from_time = parse_datetime(tokens[0:2])
-            print(f"from_time: {from_time}")
+        if len(tokens) >= 4:
+            to_str = " ".join(tokens[2:4])
+            try:
+                to_time = datetime.strptime(to_str, "%Y-%m-%d %H:%M")
+            except ValueError:
+                print(f"❌ Invalid format for 'to time': '{to_str}'")
+                to_time = None
 
-        elif len(tokens) == 3:
-            from_time = parse_datetime(tokens[0:2])
-            to_time = parse_datetime(tokens[2:3])
+    if not to_time:
+        print("❌ 'to time' is required for filtering.")
+        return
+    if not from_time:
+        print("❌ 'from time' is required for filtering.")
+        return
 
-        elif len(tokens) >= 4:
-            from_time = parse_datetime(tokens[0:2])
-            to_time = parse_datetime(tokens[2:4])
-            
-    print(f"Filtering1 from {from_time} to {to_time}")
-    
-    read_network_log(from_time, to_time)
+    print(f"Filtering from {from_time} to {to_time}")
+    if from_time and to_time:
+        read_network_log(from_time, to_time)
+        
     
