@@ -14,7 +14,7 @@ def show_network_info():
     print(f"⬇️ Received: {toolkit.format_bytes(recv)}")
     
 
-
+# Read network log
 def read_network_log(from_time=None, to_time=None):
     """Read and display network log from a file, optionally filtered by datetime."""
 
@@ -29,6 +29,7 @@ def read_network_log(from_time=None, to_time=None):
     print("📊 [PC-Hub] Network Log:")
     print("────────────────────────────")
 
+# Read the log file
 def read_network_log(from_time=None, to_time=None):
     """Read and display network log from a file, optionally filtered by datetime."""
 
@@ -60,3 +61,70 @@ def read_network_log(from_time=None, to_time=None):
             print(f"Time: {timestamp_str}, "
                   f"Sent: {toolkit.format_bytes(int(sent))}, "
                   f"Received: {toolkit.format_bytes(int(recv))}")
+            
+def network_log(self, arg):
+    print(f"Network log requested with argument: {arg}")
+    def parse_datetime(parts):
+        # Try parsing datetime from the provided parts
+        formats = [
+            "%Y-%m-%d %H:%M",
+            "%Y-%m-%d %H",
+            "%Y-%m-%d",
+            "%Y-%m",
+            "%Y"
+        ]
+        dt_str = " ".join(parts)
+        
+        for fmt in formats:
+            try:
+                return datetime.strptime(dt_str, fmt)
+            except ValueError:
+                continue
+        return None
+    
+    if arg.strip() == "day":
+        from_time = datetime.strptime(str(datetime.now() - timedelta(days=1))[:16], "%Y-%m-%d %H:%M")
+        to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
+    elif arg.strip() == "week":
+        from_time = datetime.strptime(str(datetime.now() - timedelta(weeks=1))[:16], "%Y-%m-%d %H:%M")
+        to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
+    elif arg.strip() == "month":
+        from_time = datetime.strptime(str(datetime.now() - timedelta(days=30))[:16], "%Y-%m-%d %H:%M")
+        to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
+    elif arg.strip() == "year":
+        from_time = datetime.strptime(str(datetime.now() - timedelta(days=365))[:16], "%Y-%m-%d %H:%M")
+        to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
+    elif arg.strip()[:5] == "hours":
+        try:
+            hours = int(arg.strip()[6:])
+            from_time = datetime.strptime(str(datetime.now() - timedelta(hours=hours))[:16], "%Y-%m-%d %H:%M")
+            to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
+        except ValueError:
+            print("Invalid hour format. Use 'hours <number>'.")
+            return 
+    else:
+        # Parse custom date range from the argument
+        tokens = arg.split()
+        from_time = None 
+        to_time = None
+
+
+        # Try parsing based on number of tokens
+        if len(tokens) == 1:
+            from_time = parse_datetime(tokens[:1])
+
+        elif len(tokens) == 2:
+            from_time = parse_datetime(tokens[0:2])
+
+        elif len(tokens) == 3:
+            from_time = parse_datetime(tokens[0:2])
+            to_time = parse_datetime(tokens[2:3])
+
+        elif len(tokens) >= 4:
+            from_time = parse_datetime(tokens[0:2])
+            to_time = parse_datetime(tokens[2:4])
+    
+    print(type(from_time), type(to_time))
+    print(f" from time: {from_time} to time: {to_time}")
+    read_network_log(from_time, to_time)
+    
