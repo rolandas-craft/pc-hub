@@ -57,20 +57,22 @@ def network_log(self, arg):
         print("❌ No date range specified. Use 'network --log <from> <to>' or 'network --log <day|week|month|year|hour>'")
         return
     
-    if arg.strip().split()[0] == "day":
-        now = datetime.now().replace(second=0, microsecond=0)
+    now = datetime.now().replace(second=0, microsecond=0)
+    keyword = arg.strip().split()[0]
+
+    if keyword == "day":
         from_time = now - timedelta(days=1)
         to_time = now
-    elif arg.strip().split()[0] == "week":
-        from_time = datetime.strptime(str(datetime.now() - timedelta(weeks=1))[:16], "%Y-%m-%d %H:%M")
-        to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
-    elif arg.strip().split()[0] == "month":
-        from_time = datetime.strptime(str(datetime.now() - timedelta(days=30))[:16], "%Y-%m-%d %H:%M")
-        to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
-    elif arg.strip().split()[0] == "year":
-        from_time = datetime.strptime(str(datetime.now() - timedelta(days=365))[:16], "%Y-%m-%d %H:%M")
-        to_time = datetime.strptime(str(datetime.now())[:16], "%Y-%m-%d %H:%M")
-    elif arg.strip().split()[0] == "hour":
+    elif keyword == "week":
+        from_time = now - timedelta(weeks=1)
+        to_time = now
+    elif keyword == "month":
+        from_time = now - timedelta(days=30)
+        to_time = now
+    elif keyword == "year":
+        from_time = now - timedelta(days=365)
+        to_time = now
+    elif keyword == "hour":
         # Parse the number of hours from the argument
         try:
             hours = int(arg.strip()[5:])
